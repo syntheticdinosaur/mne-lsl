@@ -291,6 +291,9 @@ class StreamLSL(BaseStream):
                     filt["sos"], data[:, filt["picks"]], zi=filt["zi"], axis=0
                 )
                 data[:, filt["picks"]] = data_filtered  # operate in-place
+                
+            for proj in [p for p in self._projections if p.active]:
+                data = proj.apply_array(data) # For most projections, this is: np.dot(matrix, data)
 
             # roll and update buffers
             self._buffer = np.roll(self._buffer, -timestamps.size, axis=0)

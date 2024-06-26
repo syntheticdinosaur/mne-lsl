@@ -30,6 +30,7 @@ from ..utils._docs import copy_doc, fill_doc
 from ..utils.logs import logger, verbose, warn
 from ..utils.meas_info import _HUMAN_UNITS, _set_channel_units
 from ._filters import StreamFilter, create_filter, ensure_sos_iir_params
+from ._projectors import StreamProjection
 
 if TYPE_CHECKING:
     from datetime import datetime
@@ -1148,6 +1149,11 @@ class BaseStream(ABC, ContainsMixin, SetChannelsMixin):
         :type: :class:`list` of ```StreamFilter``
         """
         return self._filters
+    
+    @property
+    def projections(self) -> list[StreamProjection]:
+        """List of projectors applied to the real-time Stream."""        
+        return self._projections
 
     @property
     def info(self) -> Info:
