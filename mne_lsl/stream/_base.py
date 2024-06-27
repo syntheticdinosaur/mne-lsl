@@ -30,7 +30,7 @@ from ..utils._docs import copy_doc, fill_doc
 from ..utils.logs import logger, verbose, warn
 from ..utils.meas_info import _HUMAN_UNITS, _set_channel_units
 from ._filters import StreamFilter, create_filter, ensure_sos_iir_params
-from ._projectors import StreamProjection
+from ._projections import StreamProjection
 
 if TYPE_CHECKING:
     from datetime import datetime
@@ -409,16 +409,25 @@ class BaseStream(ABC, ContainsMixin, SetChannelsMixin):
             for k in idx[::-1]:
                 del self._filters[k]
                 
-    def del_projection():
+    def del_projection(self):
         """ Delete existing projections from stream object."""
-        pass
+        raise NotImplementedError
+    
+    def activate_projections(self,
+                             projection_idx: Union[int, list[int], tuple[int]]):
+        """ Activate existing projections from stream object."""
+        for p in self._projections()[projection_idx]:
+            p._active = True
+        if len(self._projections) > 0:
+            logger.info(f"Projections {projection_idx} activated.")
 
-    def deactivate_projections():
+    def deactivate_projections(self, 
+                               projection_idx: Union[int, list[int], tuple[int]]):
         """ Deactivate existing projections from stream object."""
-        for p in self._projections():
+        for p in self._projections()[projection_idx]:
             p._active = False
         if len(self._projections) > 0:
-            logger.info(f"All projections (N = {len(self._projections)}) deactivated.")
+            logger.info(f"Projections {projection_idx} deactivated.")
             
     def drop_channels(self, ch_names: Union[str, list[str], tuple[str]]) -> BaseStream:
         """Drop channel(s).
@@ -502,6 +511,21 @@ class BaseStream(ABC, ContainsMixin, SetChannelsMixin):
         # add filter to the list of applied filters
         with self._interrupt_acquisition():
             self._filters.append(StreamFilter(filt))
+        return self
+
+    @verbose
+    @fill_doc    
+    def add_projections(self,
+                        projections: list[StreamProjection],
+                        verbose: Optional[Union[bool, str, int]] = None,
+                        activate_all = True) -> BaseStream:
+        """ Appends projections to stream, and toggles on or off."""
+        
+        with self._interrupt_acquisition():            
+            self._projections = projections              
+            if activate_all:          
+                for p in self._projections:
+                    p._active = True                
         return self
 
     @copy_doc(ContainsMixin.get_channel_types)
@@ -1085,7 +1109,7 @@ class BaseStream(ABC, ContainsMixin, SetChannelsMixin):
             self._info = pick_info(self._info, picks, verbose=logger.level)
             self._picks_inlet = self._picks_inlet[picks_inlet]
             self._buffer = self._buffer[:, picks]
-            # prune added channels which are not part of the inlet
+            # prune added chself._filters = []annels which are not part of the inlet
             for ch in self._added_channels[::-1]:
                 if ch not in self.ch_names:
                     self._added_channels.remove(ch)
@@ -1098,6 +1122,7 @@ class BaseStream(ABC, ContainsMixin, SetChannelsMixin):
         self._buffer = None
         self._executor = None
         self._filters = []
+        self._projections = []
         self._info = None
         self._n_new_samples = None
         self._picks_inlet = None
