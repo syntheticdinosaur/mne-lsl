@@ -149,13 +149,16 @@ class StreamProjection():
                  covArtifact:np.ndarray,
                  covRef:np.ndarray = None,
                  n_components:int= None,
-                 regularize:float = 0.0001):
+                 regularize:float = 1e-10):
         """ Uses eigendecomposition to compute the projection matrix.
+            Uses by default regularization, set regularize to 0 to not regularize.
             If covB is None, it computes the eigendecomposition of covA (~PCA).
             If CovB is given, it computes the generalized eigendecomposition of covA and covB (~LDA)."""
 
         assert covArtifact.shape[0] == covArtifact.shape[1], "Covariance matrix must be square."
         assert covArtifact.shape[0 > n_components], "Number of components must be less than number of channels."
+        assert regularize >= 0, "Regularization must be positive."
+        
         
         reg = np.eye(covArtifact.shape[0]) * regularize
         if covRef is None:
