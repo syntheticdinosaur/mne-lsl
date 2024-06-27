@@ -408,7 +408,18 @@ class BaseStream(ABC, ContainsMixin, SetChannelsMixin):
                 self._filters[k]["zi"] = None
             for k in idx[::-1]:
                 del self._filters[k]
+                
+    def del_projection():
+        """ Delete existing projections from stream object."""
+        pass
 
+    def deactivate_projections():
+        """ Deactivate existing projections from stream object."""
+        for p in self._projections():
+            p._active = False
+        if len(self._projections) > 0:
+            logger.info(f"All projections (N = {len(self._projections)}) deactivated.")
+            
     def drop_channels(self, ch_names: Union[str, list[str], tuple[str]]) -> BaseStream:
         """Drop channel(s).
 
