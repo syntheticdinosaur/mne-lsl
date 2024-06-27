@@ -193,8 +193,8 @@ class StreamProjection():
         self.kind   = kind
         
     def apply_array(self, data:np.ndarray):
-        assert data.shape[0] == self._matrix.shape[0], "Data and matrix must have same number of channels."
-        return np.dot(self._matrix, data)        
+        assert data.shape[0] == self.matrix.shape[0], f"Data {data.shape} and matrix {self.matrix.shape} must have same number of channels."
+        return np.dot(self.matrix, data)        
     
     def apply_raw(self,
                   raw:mne.io.RawArray,
