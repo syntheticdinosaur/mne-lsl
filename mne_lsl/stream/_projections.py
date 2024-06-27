@@ -215,14 +215,3 @@ class StreamProjection():
     def apply_evoked(self, evoked, copy=True):
         pass
     
-
-covA = np.random.randn(10)
-covA = covA[None,:].T@covA[None,:] + np.eye(10)*0.1
-
-covB = np.random.randn(10)
-covB = covB[None,:].T@covB[None,:] + np.eye(10)*0.1
-
-
-
-streamProj = StreamProjection()
-streamProj.from_cov(covA, covB, 1)
