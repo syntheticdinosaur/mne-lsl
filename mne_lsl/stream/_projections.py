@@ -27,6 +27,10 @@ class StreamProjection():
     @property
     def active(self):
         return self._active
+
+    @active.setter
+    def active(self, active):
+        self._active = active
         
     @property
     def matrix(self):
