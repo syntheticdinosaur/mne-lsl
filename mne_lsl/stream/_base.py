@@ -512,9 +512,7 @@ class BaseStream(ABC, ContainsMixin, SetChannelsMixin):
         with self._interrupt_acquisition():
             self._filters.append(StreamFilter(filt))
         return self
-
-    @verbose
-    @fill_doc    
+  
     def add_projections(self,
                         projections: list[StreamProjection],
                         verbose: Optional[Union[bool, str, int]] = None,
