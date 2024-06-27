@@ -169,12 +169,10 @@ class StreamProjection():
                   
         sidx  = np.argsort(evals)[::-1]
         evecs = evecs[:, sidx]
-        inv   = pinv(evecs)
-        
-        evecs = evecs.T
+        inv   = pinv(evecs.T)
         evecs[:, :n_components] = 0
         
-        self.matrix = np.dot(evecs, inv) #np.dot(evecs[:,n_components:], inv[n_components:,:])
+        self.matrix = np.dot(inv, evecs.T) #np.dot(evecs[:,n_components:], inv[n_components:,:])
         self._desc   = f"Eigenvalues {evals[sidx]}"
         self._kind   = "Covariance"
         self._source = "Eigendecomposition"
